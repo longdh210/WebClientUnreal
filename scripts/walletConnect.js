@@ -98,9 +98,25 @@ async function fetchAccountData() {
     // until data for all accounts is loaded
     // await Promise.all(rowResolvers);
 
+    // Sign
+    const message = "sign up";
+    const address = selectedAccount;
+
+    const signatureHash = await web3.eth.personal.sign(message, address);
+    console.log("log:", message, address, signatureHash);
+
+    console.log("Result:", verify(message, signatureHash));
+
     // Display fully loaded UI for wallet data
     document.querySelector("#prepare").style.display = "none";
     document.querySelector("#connected").style.display = "block";
+}
+
+// Verify user
+async function verify(message, signatureHash) {
+    const web3 = new Web3(provider);
+    const result = web3.eth.accounts.recover(message, signatureHash);
+    return result;
 }
 
 /**
@@ -129,6 +145,8 @@ async function refreshAccountData() {
  * Connect wallet button pressed.
  */
 async function onConnect() {
+    const web3 = new Web3(provider);
+
     console.log("Opening a dialog", web3Modal);
     try {
         provider = await web3Modal.connect();
